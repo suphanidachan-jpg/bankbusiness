@@ -21,11 +21,11 @@ small{color:#667}
 var box=document.getElementById('box');
 var id=new URLSearchParams(location.search).get('session_id')||'';
 function details(){return '<table><tr><td>หลักสูตร</td><td>B.A.N.K. BUSINESS 2 Days Intensive</td></tr><tr><td>วันที่</td><td>28–29 พฤศจิกายน 2569 (2 วันเต็ม)</td></tr><tr><td>เวลา</td><td>09.00–18.00 น.</td></tr><tr><td>สถานที่</td><td>Grande Centre Point Ploenchit</td></tr></table>'}
-function fail(){box.innerHTML='<h1 class="wait">ยังไม่พบการชำระเงิน</h1><p>หากคุณเพิ่งชำระเงิน กรุณารอสักครู่แล้วรีเฟรชหน้านี้ หรือแจ้งทีมงานทาง <a href="https://lin.ee/RaYuyrR">LINE @chana.w</a></p><a class="b" href="/#book">กลับไปหน้าจอง</a>'}
+function fail(){box.innerHTML='<h1 class="wait">ยังไม่พบการชำระเงิน</h1><p>หากคุณเพิ่งชำระเงิน กรุณารอสักครู่แล้วรีเฟรชหน้านี้ หรือแจ้งทีมงานทาง <a href="https://page.line.me/732xgjgm?oat_content=url&openQrModal=true">LINE @chana.w</a></p><a class="b" href="/#book">กลับไปหน้าจอง</a>'}
 if(!id){fail();return}
 fetch('/api/session?id='+encodeURIComponent(id)).then(function(r){return r.json()}).then(function(j){
  if(j&&j.paid){
-  box.innerHTML='<h1 class="ok">✓ ชำระเงินสำเร็จ</h1><p>ขอบคุณครับ ที่นั่งของคุณได้รับการยืนยันแล้ว เราส่งอีเมลรายละเอียดไปให้แล้ว (ถ้าไม่เห็น ลองดูในสแปม)</p>'+details()+'<small>ยอดที่ชำระ '+Number(j.amount).toLocaleString('th-TH')+' บาท · สอบถามเพิ่มเติม <a href="https://lin.ee/RaYuyrR">LINE @chana.w</a></small>';
+  box.innerHTML='<h1 class="ok">✓ ชำระเงินสำเร็จ</h1><p>ขอบคุณครับ ที่นั่งของคุณได้รับการยืนยันแล้ว เราส่งอีเมลรายละเอียดไปให้แล้ว (ถ้าไม่เห็น ลองดูในสแปม)</p>'+details()+'<small>ยอดที่ชำระ '+Number(j.amount).toLocaleString('th-TH')+' บาท · สอบถามเพิ่มเติม <a href="https://page.line.me/732xgjgm?oat_content=url&openQrModal=true">LINE @chana.w</a></small>';
  } else fail();
 }).catch(fail);
 })();
