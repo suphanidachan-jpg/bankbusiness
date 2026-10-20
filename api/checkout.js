@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 const PRICE_SATANG = 79950 * 100; // 79,950 บาท ต่อที่นั่ง (กำหนดฝั่งเซิร์ฟเวอร์เท่านั้น)
-const MAX_SEATS = 10;
+const MAX_SEATS = 50;
 
 const clean = (v) => String(v == null ? '' : v).trim().slice(0, 200);
 
