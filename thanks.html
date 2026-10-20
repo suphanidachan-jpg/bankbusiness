@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ผลการชำระเงิน | B.A.N.K. BUSINESS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f6f9;font:16px/1.7 'Noto Sans Thai',sans-serif;color:#1a1a1a}
+.w{max-width:480px;margin:0 auto;padding:32px 20px}
+.c{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(3,43,89,.08)}
+h1{margin:0 0 6px;font-size:24px;color:#032B59}
+.ok{color:#176826}.wait{color:#8a5a00}
+table{width:100%;border-collapse:collapse;margin:16px 0;border:1px solid #e3e7ec}
+td{padding:10px 12px;border-bottom:1px solid #eef0f3;vertical-align:top}td:first-child{background:#f7f9fb;width:32%;font-weight:600}
+a.b{display:block;text-align:center;background:#032B59;color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-weight:700;margin-top:16px}
+small{color:#667}
+</style></head><body><div class="w"><div class="c" id="box"><p>กำลังตรวจสอบการชำระเงิน…</p></div></div>
+<script>
+(function(){
+var box=document.getElementById('box');
+var id=new URLSearchParams(location.search).get('session_id')||'';
+function details(){return '<table><tr><td>หลักสูตร</td><td>B.A.N.K. BUSINESS 2 Days Intensive</td></tr><tr><td>วันที่</td><td>28–29 พฤศจิกายน 2569 (2 วันเต็ม)</td></tr><tr><td>เวลา</td><td>09.00–18.00 น.</td></tr><tr><td>สถานที่</td><td>Grande Centre Point Ploenchit</td></tr></table>'}
+function fail(){box.innerHTML='<h1 class="wait">ยังไม่พบการชำระเงิน</h1><p>หากคุณเพิ่งชำระเงิน กรุณารอสักครู่แล้วรีเฟรชหน้านี้ หรือแจ้งทีมงานทาง <a href="https://lin.ee/RaYuyrR">LINE @chana.w</a></p><a class="b" href="/#book">กลับไปหน้าจอง</a>'}
+if(!id){fail();return}
+fetch('/api/session?id='+encodeURIComponent(id)).then(function(r){return r.json()}).then(function(j){
+ if(j&&j.paid){
+  box.innerHTML='<h1 class="ok">✓ ชำระเงินสำเร็จ</h1><p>ขอบคุณครับ ที่นั่งของคุณได้รับการยืนยันแล้ว เราส่งอีเมลรายละเอียดไปให้แล้ว (ถ้าไม่เห็น ลองดูในสแปม)</p>'+details()+'<small>ยอดที่ชำระ '+Number(j.amount).toLocaleString('th-TH')+' บาท · สอบถามเพิ่มเติม <a href="https://lin.ee/RaYuyrR">LINE @chana.w</a></small>';
+ } else fail();
+}).catch(fail);
+})();
+</script></body></html>
