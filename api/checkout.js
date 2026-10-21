@@ -42,10 +42,19 @@ module.exports = async (req, res) => {
     return res.status(502).json({ error: 'sheet' });
   }
 
+  // 2a) ยังไม่มี Stripe key -> ส่งลูกค้าไป Payment Link ที่สร้างไว้ (ผูกด้วยรหัสอ้างอิง ไม่ใส่ข้อมูลส่วนตัวใน URL)
+  const key = process.env.STRIPE_SECRET_KEY || '';
+  const link = process.env.PAYMENT_LINK || 'https://buy.stripe.com/eVqaEWbyrfojg3udHsg360j';
+  const fallback = () => res.status(200).json({ url: link + '?client_reference_id=' + encodeURIComponent(ref) });
+  if (!/^(sk|rk)_(live|test)_/.test(key)) {
+    return fallback();
+  }
+
   // 2) สร้างหน้าชำระเงินของ Stripe (ช่องทางที่แสดงตามที่เปิดใน Stripe Dashboard)
   const f = new URLSearchParams();
   f.set('mode', 'payment');
   f.set('locale', 'th');
+  f.set('allow_promotion_codes', 'true');
   f.set('customer_email', email);
   f.set('client_reference_id', ref);
   f.set('metadata[ref]', ref);
@@ -67,9 +76,9 @@ module.exports = async (req, res) => {
       body: f.toString()
     });
     const s = await r.json();
-    if (!r.ok || !s.url) return res.status(502).json({ error: 'stripe' });
+    if (!r.ok || !s.url) return fallback();
     return res.status(200).json({ url: s.url });
   } catch (e) {
-    return res.status(502).json({ error: 'stripe' });
+    return fallback();
   }
 };
