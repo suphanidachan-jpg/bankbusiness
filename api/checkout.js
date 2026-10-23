@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-const PRICE_SATANG = 79950 * 100; // 79,950 บาท ต่อที่นั่ง (กำหนดฝั่งเซิร์ฟเวอร์เท่านั้น)
+const PRICE_SATANG = 79950 * 100; // 79,950 บาท (ราคาเต็ม — ส่วนลด BANK20K ให้ตั้งเป็นคูปองใน Stripe) ต่อที่นั่ง (กำหนดฝั่งเซิร์ฟเวอร์เท่านั้น)
 const MAX_SEATS = 50;
 
 const clean = (v) => String(v == null ? '' : v).trim().slice(0, 200);
@@ -15,6 +15,7 @@ module.exports = async (req, res) => {
   const name = clean(p.name), phone = clean(p.phone), email = clean(p.email);
   const company = clean(p.company), position = clean(p.position);
   const seats = parseInt(p.seats, 10);
+  const type = ['ALL','A','B','N','K'].includes(p.type) ? p.type : ''; // ไทป์ของหน้าที่ลูกค้าเข้ามา
   if (!name || !phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ||
       !(seats >= 1 && seats <= MAX_SEATS) || p.ack !== true) {
     return res.status(400).json({ error: 'invalid' });
@@ -33,7 +34,7 @@ module.exports = async (req, res) => {
         action: 'pending', secret: process.env.SHEET_SECRET, ref,
         name, company, position, phone, email, seats,
         marketing: p.marketing === true,
-        consentVersion: clean(p.consentVersion), utm: clean(p.utm)
+        consentVersion: clean(p.consentVersion), utm: clean(p.utm), type
       })
     });
     const j = await r.json();
@@ -58,12 +59,14 @@ module.exports = async (req, res) => {
   f.set('customer_email', email);
   f.set('client_reference_id', ref);
   f.set('metadata[ref]', ref);
+  if (type) f.set('metadata[type]', type);
   f.set('line_items[0][quantity]', String(seats));
   f.set('line_items[0][price_data][currency]', 'thb');
   f.set('line_items[0][price_data][unit_amount]', String(PRICE_SATANG));
   f.set('line_items[0][price_data][product_data][name]', 'B.A.N.K. BUSINESS 2 Days Intensive (28–29 พ.ย. 2569)');
   f.set('success_url', site + '/thanks.html?session_id={CHECKOUT_SESSION_ID}');
-  f.set('cancel_url', site + '/#book');
+  const PAGE = { A: '/a.html', B: '/b.html', N: '/n.html', K: '/k.html' }; // ALL = หน้าแรก
+  f.set('cancel_url', site + (PAGE[type] || '/') + '#book');
 
   try {
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
